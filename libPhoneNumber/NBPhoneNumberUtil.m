@@ -16,7 +16,7 @@
 #import "NBPhoneNumberDesc.h"
 #import "NBRegExMatcher.h"
 
-#if TARGET_OS_IOS
+#if __has_include(<CoreTelephony/CoreTelephony.h>)
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #endif
@@ -52,7 +52,7 @@ static BOOL isNan(NSString *sourceString) {
 @property(nonatomic, strong, readwrite) NBMetadataHelper *helper;
 @property(nonatomic, strong, readwrite) NBRegExMatcher *matcher;
 
-#if TARGET_OS_IOS
+#if __has_include(<CoreTelephony/CoreTelephony.h>)
 @property(nonatomic, readonly) CTTelephonyNetworkInfo *telephonyNetworkInfo;
 #endif
 
@@ -3462,7 +3462,7 @@ static NSArray *GEO_MOBILE_COUNTRIES;
   numberToParse = NormalizeNonBreakingSpace(numberToParse);
 
   NSString *defaultRegion = nil;
-#if TARGET_OS_IOS
+#if __has_include(<CoreTelephony/CoreTelephony.h>)
   defaultRegion = [self countryCodeByCarrier];
 #else
   defaultRegion = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
@@ -3476,7 +3476,7 @@ static NSArray *GEO_MOBILE_COUNTRIES;
   return [self parse:numberToParse defaultRegion:defaultRegion error:error];
 }
 
-#if TARGET_OS_IOS
+#if __has_include(<CoreTelephony/CoreTelephony.h>)
 
 static CTTelephonyNetworkInfo *_telephonyNetworkInfo;
 
@@ -3505,6 +3505,13 @@ static CTTelephonyNetworkInfo *_telephonyNetworkInfo;
   }
 
   return isoCode;
+}
+
+#else
+
+- (NSString *)countryCodeByCarrier
+{
+    return NB_UNKNOWN_REGION;
 }
 
 #endif
